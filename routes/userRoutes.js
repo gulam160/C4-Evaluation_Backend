@@ -1,43 +1,44 @@
-const router = express.Router();
-const UserModel = require("../models/userModel");
-
-router.post("/signup", async (req, res) => {
+const express = require("express");
+const bcrypt = require("bcrypt");
+const { UserModel } = require("../models/userModel");
+const jwt = require("jsonwebtoken");
+const userRouter = express.Router();
+userRouter.post("/register", (req, res) => {
+  const payload = req.body;
+  const { password } = payload;
   try {
-    const body = req.body;
-    const user = new UserModel(body);
-    const token = user.generateAuthToken();
-    const response = await users.save();
-    res.send(response);
-  } catch (e) {
-    res.send(e);
-  }
-});
-
-router.post("/login", async (req, res) => {
-  try {
-    const email = req.body.email;
-    const password = req.body.password;
-
-    const user = await User.findOne({ email: email });
-    const token = await user.generateAuthToken();
-    res.cookie("token", token, {
-      // maxAge: 300000,
-      expires: new Date(Date.now() + 300000),
-      httpOnly: true,
-      // secure: true,
+    bcrypt.hash(password, 3, async (err, hash) => {
+      if (err) {
+        res.status(400).send({ error: err.message });
+      } else {
+        const user = new UserModel({ ...payload, password: hash });
+        await user.save();
+        res.send({ msg: "registration successfull" });
+      }
     });
-    console.log(`jwt token is: ${token}`);
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (isMatch) {
-      // res.send(user);
-      res.redirect("/");
-    } else {
-      res.send("inVlid password!");
-    }
-  } catch (e) {
-    // console.log(e);
-    res.send("User details is invalid!");
+  } catch (err) {
+    res.status(400).send({ msg: "registration failed", error: err.message });
   }
 });
 
-module.exports = router;
+userRouter.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const user = await UserModel.find({ email });
+    if (user.length > 0) {
+      bcrypt.compare(password, user[0].password, (err, result) => {
+        if (result) {
+          let token = jwt.sign({ userID: user[0]._id }, "social");
+          res.send({ msg: "Login successful", token: token });
+        } else {
+          res.send({ msg: "wrong login details" });
+        }
+      });
+    } else {
+      res.send({ msg: "wrong details" });
+    }
+  } catch (err) {
+    res.send({ msg: "something went wrong", error: err.message });
+  }
+});
+module.exports = { userRouter };
