@@ -1,0 +1,27 @@
+{
+  "name": "c4-evaluation_backend",
+  "version": "1.0.0",
+  "description": "Problem Name :- Linkedin Users and Posts App",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "server": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gulam160/C4-Evaluation_Backend.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gulam160/C4-Evaluation_Backend/issues"
+  },
+  "homepage": "https://github.com/gulam160/C4-Evaluation_Backend#readme",
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "mongoose": "^7.0.3",
+    "nodemon": "^2.0.22"
+  }
+}
