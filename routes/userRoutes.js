@@ -3,22 +3,20 @@ const bcrypt = require("bcrypt");
 const { UserModel } = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 const userRouter = express.Router();
+
 userRouter.post("/register", (req, res) => {
   const payload = req.body;
   const { password } = payload;
-  try {
-    bcrypt.hash(password, 3, async (err, hash) => {
-      if (err) {
-        res.status(400).send({ error: err.message });
-      } else {
-        const user = new UserModel({ ...payload, password: hash });
-        await user.save();
-        res.send({ msg: "registration successfull" });
-      }
-    });
-  } catch (err) {
-    res.status(400).send({ msg: "registration failed", error: err.message });
-  }
+
+  bcrypt.hash(password, 10, async (err, hash) => {
+    if (err) {
+      res.status(400).send({ error: err.message });
+    } else {
+      const user = new UserModel({ ...payload, password: hash });
+      await user.save();
+      res.send({ msg: "registration successful" });
+    }
+  });
 });
 
 userRouter.post("/login", async (req, res) => {
